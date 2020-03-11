@@ -587,7 +587,6 @@ public class BlockGame extends JPanel implements ActionListener {
                     }
                 }
                 tempPattern = peaces.get(patternSelect);
-                
 
                 Point[] pa = peaces.get(patternSelect);
                 for (int i = 0; i < cubes.size(); i++) {
@@ -673,9 +672,11 @@ public class BlockGame extends JPanel implements ActionListener {
         g2.setColor(Color.LIGHT_GRAY);
         g2.fillRect(0, 0, getWidth(), getHeight());
         grid(g2);
+        puzzleMenu(g2);
         if (setAnimation) {
             animPlace(g2);
-        } else if (setAnimationReturn) {
+        }
+        if (setAnimationReturn) {
             animationReturn(g2);
         }
         if (end) {
@@ -686,25 +687,23 @@ public class BlockGame extends JPanel implements ActionListener {
 
     private void animationReturn(Graphics2D g2) {
         System.out.println("drop");
-        
-        
-            for (Point p : tempPattern) {
+
+        for (Point p : peaces.get(patternSelect)) {
             Shape pat = U.makeRectangle(
                     newx + (p.x - (startSize1 / 2)),
                     newy + (p.y - (startSize1 / 2)),
                     newx + (p.x + (startSize1 - (startSize1 / 2))),
                     newy + (p.y + (startSize1 - (startSize1 / 2)))
             );
-            g2.setPaint(new Color(anR, anG, anB));
+            g2.setPaint( Color.red);
             // g2.setPaint(new Color(0, 0, 255));
             g2.fill(pat);
             g2.setPaint(Color.black);
             g2.setStroke(new BasicStroke(1));
             g2.draw(pat);
         }
-        
-        
-        setAnimationReturn = false; 
+
+        setAnimationReturn = false;
     }//end animationReturn
 
     private void animPlace(Graphics2D g2) {
@@ -744,8 +743,6 @@ public class BlockGame extends JPanel implements ActionListener {
 
         //System.out.println(cubes.get(snapCubeUM).getX() + " " + cubes.get(snapCubeUM).getY() + " " + newx + " " + newy);
         // System.out.println(c.getX()>newx);
-        
-
         if (startSize1 < 50) {
             startSize1++;
         } else if (startSize1 == 50) {
@@ -830,130 +827,13 @@ public class BlockGame extends JPanel implements ActionListener {
                     g2.drawString("" + clock + "", c.getX() + c.getW() / 2, c.getY() + c.getH() / 2);
          */
     }//end menu
-    
-     private void puzzleMenu(Graphics2D g2) {
-     
-     }//end puzzleMenu
 
-    private void grid(Graphics2D g2) {
-
-        g2.setPaint(Color.black);
-        cubes = cubeObject.getCubes();
-        int clock = 0;
-        for (Cube c : cubes) {
-            switch (c.getNs()) {
-                case 1:
-                    g2.setPaint(Color.white);
-                    g2.fill(c.getS());
-                    g2.setPaint(Color.gray);
-                    g2.setStroke(new BasicStroke(1));
-                    g2.draw(c.getS());
-
-                    /*
-                    Font font = new Font("Serif", Font.PLAIN, 12);
-                    g2.setFont(font);
-                    g2.drawString("" + clock + "", c.getX() + c.getW() / 2, c.getY() + c.getH() / 2);
-                     */
-                    break;
-                case 2:
-                    lightBlueArray = null;
-                    g2.setPaint(new Color(200, 200, 200));
-                    g2.fill(c.getS());
-                    g2.setPaint(Color.black);
-                    g2.setStroke(new BasicStroke(1));
-                    g2.draw(c.getS());
-                    break;
-                case 3:
-                    g2.setPaint(new Color(120, 120, 120));
-                    g2.fill(c.getS());
-                    g2.setPaint(Color.black);
-                    g2.setStroke(new BasicStroke(1));
-                    g2.draw(c.getS());
-                    break;
-                case 4:
-
-                    g2.setPaint(Color.blue);
-                    g2.fill(c.getS());
-                    g2.setPaint(Color.black);
-                    g2.setStroke(new BasicStroke(1));
-                    g2.draw(c.getS());
-
-                    break;
-                case 5:
-                    g2.setPaint(Color.white);
-                    g2.fill(c.getS());
-                    g2.setPaint(Color.black);
-                    g2.setStroke(new BasicStroke(1));
-                    g2.draw(c.getS());
-
-                    if (counter1 >= 0) {
-                        lightBlueArray = null;
-                        Shape pat = U.makeRectangle(
-                                (c.getX() + c.getW() / 2) - (counter1 / 2),
-                                (c.getY() + c.getH() / 2) - (counter1 / 2),
-                                ((c.getX() + c.getW() / 2) - (counter1 / 2)) + counter1,
-                                ((c.getY() + c.getH() / 2) - (counter1 / 2)) + counter1
-                        );
-                        g2.setPaint(new Color(0, 0, 0));
-                        g2.fill(pat);
-                        g2.draw(pat);
-                        counter1--;
-
-                    }
-                    break;
-                default:
-                    System.out.println("Color Switch not working!");
-            }
-            clock++;
-        }
-
-        if (lightBlueArray != null) {
-            if (lightBlueArray.size() > 0) {
-                for (int i = 0; i < cubes.size(); i++) {
-                    for (int j = 0; j < lightBlueArray.size(); j++) {
-                        for (int l = 0; l < lightBlueArray.get(j).length; l++) {
-                            if (i == lightBlueArray.get(j)[l]) {
-                                boolean trig = true;
-                                for (int m = 0; m < grayArray.size(); m++) {
-                                    if (i == grayArray.get(m)) {
-                                        trig = false;
-                                    }
-                                }
-                                if (trig) {
-                                    g2.setPaint(new Color(100, 100, 230));
-                                    g2.fill(cubes.get(i).getS());
-                                    g2.setPaint(Color.black);
-                                    g2.setStroke(new BasicStroke(1));
-                                    g2.draw(cubes.get(i).getS());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-        
-        
-
-        g2.setPaint(cubeObject.getGc());
-
-        g2.setStroke(new BasicStroke(1));
+    private void puzzleMenu(Graphics2D g2) {
         int lGCW = cubeObject.getW() / 3, lGCH = cubeObject.getH() / 3;
         int dzgOffsetX = 200, dzgOffsetY = 200;
         int x = cubeObject.getX(), y = cubeObject.getY();
         int r = cubeObject.getRow(), c = cubeObject.getCol();
         int cellW = cubeObject.getCellW(), cellH = cubeObject.getCellH();
-
-        //six grid        
-        g2.setStroke(new BasicStroke(3));
-        for (int i = 0; i < cubes.size() / 27; i++) {
-            for (int j = 0; j < cubes.size() / 27; j++) {
-                Shape shape = U.makeRectangle(x + (lGCW * j), y + (lGCH * i), x + ((lGCW * j) + lGCW), y + ((lGCH * i) + lGCH));
-                g2.draw(shape);
-            }
-        }
-
         ///// drag zones
         g2.setStroke(new BasicStroke(3));
         dragZones = new Point[3];
@@ -992,7 +872,6 @@ public class BlockGame extends JPanel implements ActionListener {
         g2.setPaint(Color.black);
         Shape shape = U.makeRectangle(cubeObject.getX(), cubeObject.getY(), cubeObject.getX() + cubeObject.getW(), cubeObject.getY() + cubeObject.getH());
         g2.draw(shape);
-
         //pattern
         for (int i = 0; i < peaces.size(); i++) {
             int startSize1 = 40;
@@ -1102,6 +981,124 @@ public class BlockGame extends JPanel implements ActionListener {
 
                     }
                 }
+            }
+        }
+
+    }//end puzzleMenu
+
+    private void grid(Graphics2D g2) {
+
+        g2.setPaint(Color.black);
+        cubes = cubeObject.getCubes();
+        int clock = 0;
+        for (Cube c : cubes) {
+            switch (c.getNs()) {
+                case 1:
+                    g2.setPaint(Color.white);
+                    g2.fill(c.getS());
+                    g2.setPaint(Color.gray);
+                    g2.setStroke(new BasicStroke(1));
+                    g2.draw(c.getS());
+
+                    /*
+                    Font font = new Font("Serif", Font.PLAIN, 12);
+                    g2.setFont(font);
+                    g2.drawString("" + clock + "", c.getX() + c.getW() / 2, c.getY() + c.getH() / 2);
+                     */
+                    break;
+                case 2:
+                    lightBlueArray = null;
+                    g2.setPaint(new Color(200, 200, 200));
+                    g2.fill(c.getS());
+                    g2.setPaint(Color.black);
+                    g2.setStroke(new BasicStroke(1));
+                    g2.draw(c.getS());
+                    break;
+                case 3:
+                    g2.setPaint(new Color(120, 120, 120));
+                    g2.fill(c.getS());
+                    g2.setPaint(Color.black);
+                    g2.setStroke(new BasicStroke(1));
+                    g2.draw(c.getS());
+                    break;
+                case 4:
+
+                    g2.setPaint(Color.blue);
+                    g2.fill(c.getS());
+                    g2.setPaint(Color.black);
+                    g2.setStroke(new BasicStroke(1));
+                    g2.draw(c.getS());
+
+                    break;
+                case 5:
+                    g2.setPaint(Color.white);
+                    g2.fill(c.getS());
+                    g2.setPaint(Color.black);
+                    g2.setStroke(new BasicStroke(1));
+                    g2.draw(c.getS());
+
+                    if (counter1 >= 0) {
+                        lightBlueArray = null;
+                        Shape pat = U.makeRectangle(
+                                (c.getX() + c.getW() / 2) - (counter1 / 2),
+                                (c.getY() + c.getH() / 2) - (counter1 / 2),
+                                ((c.getX() + c.getW() / 2) - (counter1 / 2)) + counter1,
+                                ((c.getY() + c.getH() / 2) - (counter1 / 2)) + counter1
+                        );
+                        g2.setPaint(new Color(0, 0, 0));
+                        g2.fill(pat);
+                        g2.draw(pat);
+                        counter1--;
+
+                    }
+                    break;
+                default:
+                    System.out.println("Color Switch not working!");
+            }
+            clock++;
+        }
+
+        if (lightBlueArray != null) {
+            if (lightBlueArray.size() > 0) {
+                for (int i = 0; i < cubes.size(); i++) {
+                    for (int j = 0; j < lightBlueArray.size(); j++) {
+                        for (int l = 0; l < lightBlueArray.get(j).length; l++) {
+                            if (i == lightBlueArray.get(j)[l]) {
+                                boolean trig = true;
+                                for (int m = 0; m < grayArray.size(); m++) {
+                                    if (i == grayArray.get(m)) {
+                                        trig = false;
+                                    }
+                                }
+                                if (trig) {
+                                    g2.setPaint(new Color(100, 100, 230));
+                                    g2.fill(cubes.get(i).getS());
+                                    g2.setPaint(Color.black);
+                                    g2.setStroke(new BasicStroke(1));
+                                    g2.draw(cubes.get(i).getS());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        g2.setPaint(cubeObject.getGc());
+
+        g2.setStroke(new BasicStroke(1));
+        int lGCW = cubeObject.getW() / 3, lGCH = cubeObject.getH() / 3;
+        int dzgOffsetX = 200, dzgOffsetY = 200;
+        int x = cubeObject.getX(), y = cubeObject.getY();
+        int r = cubeObject.getRow(), c = cubeObject.getCol();
+        int cellW = cubeObject.getCellW(), cellH = cubeObject.getCellH();
+
+        //six grid        
+        g2.setStroke(new BasicStroke(3));
+        for (int i = 0; i < cubes.size() / 27; i++) {
+            for (int j = 0; j < cubes.size() / 27; j++) {
+                Shape shape = U.makeRectangle(x + (lGCW * j), y + (lGCH * i), x + ((lGCW * j) + lGCW), y + ((lGCH * i) + lGCH));
+                g2.draw(shape);
             }
         }
 
