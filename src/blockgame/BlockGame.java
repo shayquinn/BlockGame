@@ -65,28 +65,28 @@ public class BlockGame extends JPanel implements ActionListener {
     private boolean dispalyReturn = false;
 
     private int cubeUM;
+    private int snapCubeUM;
 
     private boolean[] patternsPosable = {true, true, true};
-
-    boolean testing = false;
-    boolean testing1 = false;
-    boolean testing2 = false;
-    boolean testing3 = false;
 
     boolean mouseDown = false;
     private boolean selected = false;
 
     private int patternSelect = -1;
-    private int snapPatternSelect = -1;
+    private int tempPatternSelect = -1;
 
-    int tempx = 185, tempy = 185;
+    private int tempx = 185, tempy = 185;
+    private int anR = 100, anG = 100, anB = 230;
+
+    private int newx = 0, newy = 0;
+
+    private int startSize1 = 40;
+    private Point[] tempPattern;
 
     private ArrayList<Point[]> allPeaces;
     private ArrayList<Point[]> peaces;
-    private ArrayList<Point[]> staticPeaces;
 
     private ArrayList<Integer> tempBlueArray;
-    private ArrayList<Integer> blueArray;
     private ArrayList<int[]> lightBlueArray;
     private ArrayList<Integer> grayArray;
     private ArrayList<Integer> lightGrayArray;
@@ -95,7 +95,20 @@ public class BlockGame extends JPanel implements ActionListener {
 
     private Point[] dragZones;
 
+    private boolean setAnimation = false;
+    private boolean setAnimationReturn = false;
+    private int setAnimationCounter = 0;
+
     private int counter1 = 0;
+
+    private boolean end = false;
+    private final int menux1 = 400;
+    private final int menuy1 = 200;
+    private final int menux2 = 400;
+    private final int menuy2 = 400;
+    private final int menuw = 200;
+    private final int menuh = 100;
+    boolean menu1hov = false, menu2hov = false;
 
     private static Point xy = new Point(0, 0);
 
@@ -146,68 +159,93 @@ public class BlockGame extends JPanel implements ActionListener {
         allPeaces = new ArrayList<>();
 
         Point[] p1 = {
-            new Point(0, 0),
-            new Point(50, 50),
-            new Point(-50, -50),};
+            new Point(0, 0)
+        };
         allPeaces.add(p1);
 
         Point[] p2 = {
             new Point(0, 0),
-            new Point(0, 50),
-            new Point(0, -50),};
+            new Point(0, 50)
+        };
         allPeaces.add(p2);
 
         Point[] p3 = {
             new Point(0, 0),
-            new Point(50, 0),
-            new Point(-50, 0),};
+            new Point(50, 0)
+        };
         allPeaces.add(p3);
 
-        Point[] p4 = {
-            new Point(0, 0)
-        };
-        allPeaces.add(p4);
-
-        Point[] p5 = {
-            new Point(0, 0),
-            new Point(50, 0),
-            new Point(-50, 0),
-            new Point(50, 50),
-            new Point(-50, 50)
-        };
-        allPeaces.add(p5);
         Point[] p6 = {
             new Point(0, 0),
-            new Point(50, 0),
-            new Point(-50, 0),
-            new Point(50, -50),
             new Point(-50, -50)
         };
         allPeaces.add(p6);
 
         Point[] p7 = {
             new Point(0, 0),
-            new Point(50, -50),
-            new Point(-50, 50),};
+            new Point(50, 50)
+        };
         allPeaces.add(p7);
 
-        Point[] p8 = {
+        Point[] p10 = {
+            new Point(0, 0),
+            new Point(50, 50),
+            new Point(-50, -50),};
+        allPeaces.add(p10);
+
+        Point[] p11 = {
+            new Point(0, 0),
+            new Point(0, 50),
+            new Point(0, -50),};
+        allPeaces.add(p11);
+
+        Point[] p12 = {
+            new Point(0, 0),
+            new Point(50, 0),
+            new Point(-50, 0),};
+        allPeaces.add(p12);
+
+        Point[] p13 = {
+            new Point(0, 0),
+            new Point(50, 0),
+            new Point(-50, 0),
+            new Point(50, 50),
+            new Point(-50, 50)
+        };
+        allPeaces.add(p13);
+
+        Point[] p14 = {
+            new Point(0, 0),
+            new Point(50, 0),
+            new Point(-50, 0),
+            new Point(50, -50),
+            new Point(-50, -50)
+        };
+        allPeaces.add(p14);
+
+        Point[] p15 = {
+            new Point(0, 0),
+            new Point(50, -50),
+            new Point(-50, 50),};
+        allPeaces.add(p15);
+
+        Point[] p16 = {
             new Point(0, 0),
             new Point(50, 0),
             new Point(-50, 0),
             new Point(50, -50),
             new Point(-50, 50)
         };
-        allPeaces.add(p8);
+        allPeaces.add(p16);
 
-        Point[] p9 = {
+        Point[] p17 = {
             new Point(0, 0),
             new Point(50, 0),
             new Point(-50, 0),
             new Point(50, 50),
             new Point(-50, -50)
         };
-        allPeaces.add(p9);
+        allPeaces.add(p17);
 
         /*
          Point[] p1 = {
@@ -303,12 +341,34 @@ public class BlockGame extends JPanel implements ActionListener {
                 @Override
                 public void mouseReleased(MouseEvent e) {
                     if (e.getButton() == MouseEvent.BUTTON1) {
-                        pressCon();
+                        if (end) {
+                            if (menu1hov) {
+                                end = false;
+                                for (Cube c : cubes) {
+                                    c.setNs(1);
+                                }
+                                randomPeaces();
+                                for (int i = 0; i < noFit.length; i++) {
+                                    noFit[i] = true;
+                                    patternsDispay[i] = true;
+                                }
+
+                            }
+                            if (menu2hov) {
+                                System.exit(1);
+                            }
+                        } else {
+                            pressCon();
+                        }
 
                         mouseDown = false;
                         selected = false;
-                        snapPatternSelect = patternSelect;
+
                         snapMouse = mouse;
+
+                        newx = snapMouse.x;
+                        newy = snapMouse.y;
+                        tempPatternSelect = patternSelect;
                         patternSelect = -1;
 
                     }
@@ -325,20 +385,43 @@ public class BlockGame extends JPanel implements ActionListener {
                 @Override
                 public void mouseDragged(MouseEvent e) {
                     mouse = new Point(e.getX(), e.getY());
-                    contanes();
+                    if (!end) {
+                        contanes();
+                    } else {
+                        menu();
+                    }
+
                     //checkShape();
                 }
 
                 @Override
                 public void mouseMoved(MouseEvent e) {
                     mouse = new Point(e.getX(), e.getY());
-                    contanes();
+                    if (!end) {
+                        contanes();
+                    } else {
+                        menu();
+                    }
                     //checkShape();
                 }
 
             });//end addMouseMotionListener                
         }//end PaintSurface constructer
     }//end PaintSurface
+
+    private void menu() {
+        if (U.cons(menux1, menuy1, menuw, menuh, mouse.x, mouse.y)) {
+            menu1hov = true;
+        } else {
+            menu1hov = false;
+        }
+        if (U.cons(menux2, menuy2, menuw, menuh, mouse.x, mouse.y)) {
+            menu2hov = true;
+        } else {
+            menu2hov = false;
+        }
+
+    }//end menu
 
     private void contanes() {
         tempBlueArray = new ArrayList<>();
@@ -351,8 +434,6 @@ public class BlockGame extends JPanel implements ActionListener {
         int count = 0;
         broken = false;
         int brokenCounter = 0;
-
-        testing = U.cons(cubeObject.getX(), cubeObject.getY(), cubeObject.getW(), cubeObject.getH(), mouse.x, mouse.y);
 
         for (int i = 0; i < dragZones.length; i++) {
             if (U.cons(dragZones[i].x, dragZones[i].y, (cubeObject.getCellW() * 3), (cubeObject.getCellH() * 3), mouse.x, mouse.y)) {
@@ -489,13 +570,25 @@ public class BlockGame extends JPanel implements ActionListener {
         //    System.out.println(U.checkPatternOnBlock(new Point(mouse.x, mouse.y), peaces.get(patternSelect), cubes));
         //}
         //checkCompleet();
-        
+
         patternsPosable = U.checkShape(peaces, cubes);
     }//end contanes
 
     private void pressCon() {
         if (patternSelect >= 0) {
             if (!broken) {
+                setAnimation = true;
+                setAnimationCounter = 20;
+
+                for (int i = 0; i < cubes.size(); i++) {
+                    if (U.cons(cubes.get(i).getX() + 1, cubes.get(i).getY() + 1, cubes.get(i).getW() - 1, cubes.get(i).getH() - 1, mouse.x, mouse.y)) {
+                        snapCubeUM = i;
+                        //System.out.println("cubeUM: "+cubeUM);
+                    }
+                }
+                tempPattern = peaces.get(patternSelect);
+                
+
                 Point[] pa = peaces.get(patternSelect);
                 for (int i = 0; i < cubes.size(); i++) {
                     for (Point pa1 : pa) {
@@ -514,6 +607,7 @@ public class BlockGame extends JPanel implements ActionListener {
                     dispalyRestart = true;
                 }
             } else {
+                setAnimationReturn = true;
                 dispalyReturn = true;
             }
         }
@@ -525,11 +619,14 @@ public class BlockGame extends JPanel implements ActionListener {
                 c.setNs(1);
             }
         });
+
+    }//end pressCon
+
+    private void checkForCompleetNull() {
         int[] temInt2 = new int[cubes.size()];
         for (int i = 0; i < cubes.size(); i++) {
             temInt2[i] = cubes.get(i).getNs();
         }
-
         ArrayList<int[]> nullList = U.checkCompleet(temInt2);
 
         if (nullList.size() > 0) {
@@ -541,9 +638,32 @@ public class BlockGame extends JPanel implements ActionListener {
             });
         }
         noFit = U.checkShape(peaces, cubes);
-        System.out.println(noFit[0] + ", " + noFit[1] + ", " + noFit[2] + ",");
+        boolean[] tembull = {true, true, true};
+        if (patternsDispay[0] == false && patternsDispay[1] == false && patternsDispay[2] == false) {
+        } else {
+            if (!patternsDispay[0]) {
+                tembull[0] = false;
+            } else {
+                tembull[0] = noFit[0];
+            }
 
-    }//end pressCon
+            if (!patternsDispay[1]) {
+                tembull[1] = false;
+            } else {
+                tembull[1] = noFit[1];
+            }
+
+            if (!patternsDispay[2]) {
+                tembull[2] = false;
+            } else {
+                tembull[2] = noFit[2];
+            }
+
+            if (tembull[0] == false && tembull[1] == false && tembull[2] == false) {
+                end = true;
+            }
+        }
+    }//end checkForCompleetNull
 
     public void paint(Graphics g) {
         super.paint(g);
@@ -553,11 +673,167 @@ public class BlockGame extends JPanel implements ActionListener {
         g2.setColor(Color.LIGHT_GRAY);
         g2.fillRect(0, 0, getWidth(), getHeight());
         grid(g2);
+        if (setAnimation) {
+            animPlace(g2);
+        } else if (setAnimationReturn) {
+            animationReturn(g2);
+        }
+        if (end) {
+            menu(g2);
+        }
 
     }//end paint
 
-    private void pointershape(Graphics2D g2) {
-    }
+    private void animationReturn(Graphics2D g2) {
+        System.out.println("drop");
+        
+        
+            for (Point p : tempPattern) {
+            Shape pat = U.makeRectangle(
+                    newx + (p.x - (startSize1 / 2)),
+                    newy + (p.y - (startSize1 / 2)),
+                    newx + (p.x + (startSize1 - (startSize1 / 2))),
+                    newy + (p.y + (startSize1 - (startSize1 / 2)))
+            );
+            g2.setPaint(new Color(anR, anG, anB));
+            // g2.setPaint(new Color(0, 0, 255));
+            g2.fill(pat);
+            g2.setPaint(Color.black);
+            g2.setStroke(new BasicStroke(1));
+            g2.draw(pat);
+        }
+        
+        
+        setAnimationReturn = false; 
+    }//end animationReturn
+
+    private void animPlace(Graphics2D g2) {
+        boolean bull1 = false, bull2 = false, bull3 = false, bull4 = false, bull5 = false;
+        //System.out.println(c.getX()+" "+c.getY()+" "+newx+" "+newy);
+        int startSize2 = 30;
+
+        for (Point p : tempPattern) {
+            Shape pat = U.makeRectangle(
+                    cubes.get(snapCubeUM).getX() + p.x,
+                    cubes.get(snapCubeUM).getY() + p.y,
+                    cubes.get(snapCubeUM).getX() + (p.x + 50),
+                    cubes.get(snapCubeUM).getY() + (p.y + 50)
+            );
+            g2.setPaint(Color.white);
+            // g2.setPaint(new Color(0, 0, 255));
+            g2.fill(pat);
+            g2.setPaint(Color.black);
+            g2.setStroke(new BasicStroke(1));
+            g2.draw(pat);
+        }
+
+        for (Point p : tempPattern) {
+            Shape pat = U.makeRectangle(
+                    newx + (p.x - (startSize1 / 2)),
+                    newy + (p.y - (startSize1 / 2)),
+                    newx + (p.x + (startSize1 - (startSize1 / 2))),
+                    newy + (p.y + (startSize1 - (startSize1 / 2)))
+            );
+            g2.setPaint(new Color(anR, anG, anB));
+            // g2.setPaint(new Color(0, 0, 255));
+            g2.fill(pat);
+            g2.setPaint(Color.black);
+            g2.setStroke(new BasicStroke(1));
+            g2.draw(pat);
+        }
+
+        //System.out.println(cubes.get(snapCubeUM).getX() + " " + cubes.get(snapCubeUM).getY() + " " + newx + " " + newy);
+        // System.out.println(c.getX()>newx);
+        
+
+        if (startSize1 < 50) {
+            startSize1++;
+        } else if (startSize1 == 50) {
+            bull1 = true;
+        }
+
+        if (cubes.get(snapCubeUM).getX() > newx - (startSize1 / 2)) {
+            newx++;
+        } else if (cubes.get(snapCubeUM).getX() < newx - (startSize1 / 2)) {
+            newx--;
+        } else if (cubes.get(snapCubeUM).getX() == newx - (startSize1 / 2)) {
+            bull2 = true;
+        }
+
+        if (cubes.get(snapCubeUM).getY() > newy - (startSize1 / 2)) {
+            newy++;
+        } else if (cubes.get(snapCubeUM).getY() < newy - (startSize1 / 2)) {
+            newy--;
+        } else if (cubes.get(snapCubeUM).getY() == newy - (startSize1 / 2)) {
+            bull3 = true;
+        }
+
+        if (anR > 0) {
+            anR -= 5;
+            anG -= 5;
+        } else if (anR == 0) {
+            bull4 = true;
+        }
+        if (anB < 255) {
+            anB++;
+        } else if (anB == 255) {
+            bull5 = true;
+        }
+        //System.out.println(bull1 + " " + bull2 + " " + bull3 + " " + bull4 + " " + bull5);
+        if (bull1 && bull2 && bull3 && bull4 && bull5) {
+            setAnimation = false;
+            startSize1 = 40;
+            anR = 100;
+            anG = 100;
+            anB = 230;
+            checkForCompleetNull();
+
+        }
+
+    }//end animFin
+
+    private void menu(Graphics2D g2) {
+
+        Font font = new Font("Serif", Font.BOLD, 30);
+        Shape s1 = U.makeRectangle(menux1, menuy1, menux1 + menuw, menuy1 + menuh);
+        g2.setPaint(Color.white);
+        g2.fill(s1);
+        if (menu1hov) {
+            g2.setPaint(Color.green);
+        } else {
+            g2.setPaint(Color.black);
+        }
+
+        g2.setStroke(new BasicStroke(2));
+        g2.draw(s1);
+
+        g2.setFont(font);
+        g2.drawString(" Start ", menux1 + menuw / 2, menuy1 + menuh / 2);
+
+        Shape s2 = U.makeRectangle(menux2, menuy2, menux2 + menuw, menuy2 + menuh);
+        g2.setPaint(Color.white);
+        g2.fill(s2);
+        if (menu2hov) {
+            g2.setPaint(Color.green);
+        } else {
+            g2.setPaint(Color.black);
+        }
+        g2.setStroke(new BasicStroke(2));
+        g2.draw(s2);
+
+        g2.setFont(font);
+        g2.drawString(" Exit ", menux2 + menuw / 2, menuy2 + menuh / 2);
+
+        /*
+                    Font font = new Font("Serif", Font.PLAIN, 12);
+                    g2.setFont(font);
+                    g2.drawString("" + clock + "", c.getX() + c.getW() / 2, c.getY() + c.getH() / 2);
+         */
+    }//end menu
+    
+     private void puzzleMenu(Graphics2D g2) {
+     
+     }//end puzzleMenu
 
     private void grid(Graphics2D g2) {
 
@@ -595,11 +871,13 @@ public class BlockGame extends JPanel implements ActionListener {
                     g2.draw(c.getS());
                     break;
                 case 4:
+
                     g2.setPaint(Color.blue);
                     g2.fill(c.getS());
                     g2.setPaint(Color.black);
                     g2.setStroke(new BasicStroke(1));
                     g2.draw(c.getS());
+
                     break;
                 case 5:
                     g2.setPaint(Color.white);
@@ -654,6 +932,9 @@ public class BlockGame extends JPanel implements ActionListener {
                 }
             }
         }
+        
+        
+        
 
         g2.setPaint(cubeObject.getGc());
 
@@ -745,7 +1026,7 @@ public class BlockGame extends JPanel implements ActionListener {
 
                         }
                         g2.fill(pat);
-                        g2.setPaint(Color.gray);
+                        g2.setPaint(Color.black);
                         g2.setStroke(new BasicStroke(1));
                         g2.draw(pat);
                     }
@@ -758,13 +1039,12 @@ public class BlockGame extends JPanel implements ActionListener {
                 } else {
                     displayCounter = 0;
                     Shape pat;
-                    for (Point get : peaces.get(i)) {
-                    }
                     if (i == patternSelect && mouseDown) {
                         for (Point get : peaces.get(i)) {
                             int nx = get.x;
                             int ny = get.y;
                             Point p = new Point(nx, ny);
+
                             pat = U.makeRectangle(
                                     mouse.x + (p.x - (startSize1 / 2)),
                                     mouse.y + (p.y - (startSize1 / 2)),
@@ -773,7 +1053,7 @@ public class BlockGame extends JPanel implements ActionListener {
                             );
                             g2.setPaint(new Color(100, 100, 230));
                             g2.fill(pat);
-                            g2.setPaint(Color.gray);
+                            g2.setPaint(Color.black);
                             g2.setStroke(new BasicStroke(1));
                             g2.draw(pat);
                         }
@@ -815,7 +1095,7 @@ public class BlockGame extends JPanel implements ActionListener {
 
                             }
                             g2.fill(pat);
-                            g2.setPaint(Color.gray);
+                            g2.setPaint(Color.black);
                             g2.setStroke(new BasicStroke(1));
                             g2.draw(pat);
                         }
