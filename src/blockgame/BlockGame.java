@@ -81,6 +81,12 @@ public class BlockGame extends JPanel implements ActionListener {
     private int newx = 0, newy = 0;
 
     private int startSize1 = 40;
+    private int tempStartSize1 = startSize1;
+    private int startSize2 = 30;
+    private int tempStartSize2 = startSize2;
+    private int tempGap = 0;
+    private double an2R = 100.0, an2G = 100.0, an2B = 230.0;
+
     private Point[] tempPattern;
 
     private ArrayList<Point[]> allPeaces;
@@ -100,6 +106,7 @@ public class BlockGame extends JPanel implements ActionListener {
     private int setAnimationCounter = 0;
 
     private int counter1 = 0;
+    private int animationReturnCount = 0;
 
     private boolean end = false;
     private final int menux1 = 400;
@@ -577,6 +584,8 @@ public class BlockGame extends JPanel implements ActionListener {
     private void pressCon() {
         if (patternSelect >= 0) {
             if (!broken) {
+                Sound s = new Sound("drop4.wav");
+                s.start();
                 setAnimation = true;
                 setAnimationCounter = 20;
 
@@ -607,6 +616,18 @@ public class BlockGame extends JPanel implements ActionListener {
                 }
             } else {
                 setAnimationReturn = true;
+                Sound s = new Sound("return.wav");
+                s.start();
+                /*try {
+                    new Thread() {
+                        public void run() {
+                            
+                        }
+                    }.start();
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                }*/
+
                 dispalyReturn = true;
             }
         }
@@ -676,6 +697,7 @@ public class BlockGame extends JPanel implements ActionListener {
         if (setAnimation) {
             animPlace(g2);
         }
+
         if (setAnimationReturn) {
             animationReturn(g2);
         }
@@ -686,30 +708,102 @@ public class BlockGame extends JPanel implements ActionListener {
     }//end paint
 
     private void animationReturn(Graphics2D g2) {
-        System.out.println("drop");
+        //System.out.println(tempPatternSelect);
+        int lGCW = cubeObject.getW() / 3, lGCH = cubeObject.getH() / 3;
+        int dzgOffsetX = 200, dzgOffsetY = 200;
+        int yy = cubeObject.getY();
+        int tempsiaze;
 
-        for (Point p : peaces.get(patternSelect)) {
-            Shape pat = U.makeRectangle(
-                    newx + (p.x - (startSize1 / 2)),
-                    newy + (p.y - (startSize1 / 2)),
-                    newx + (p.x + (startSize1 - (startSize1 / 2))),
-                    newy + (p.y + (startSize1 - (startSize1 / 2)))
+        Shape shape = U.makeRectangle(dzgOffsetX, yy + (lGCW * tempPatternSelect), dzgOffsetY + lGCH, yy + ((lGCW * tempPatternSelect) + lGCH));
+        dragZones[tempPatternSelect] = new Point(dzgOffsetX, yy + (lGCH * tempPatternSelect));
+        g2.setPaint(Color.white);
+        g2.fill(shape);
+        g2.setPaint(Color.black);
+        g2.setStroke(new BasicStroke(3));
+        g2.draw(shape);
+
+        for (Point p : peaces.get(tempPatternSelect)) {
+            //mouse.x + (p.x - (startSize1 / 2)),
+            //mouse.y + (p.y - (startSize1 / 2)),
+            //mouse.x + (p.x + (startSize1 - (startSize1 / 2))),
+            //mouse.y + (p.y + (startSize1 - (startSize1 / 2)))
+            /*
+            int nx = 0, ny = 0;
+            if (get.x > 0) {
+                nx = get.x + -20;
+            } else if (get.x < 0) {
+                nx = get.x - -20;
+            }
+            if (get.y > 0) {
+                ny = get.y + -20;
+            } else if (get.y < 0) {
+                ny = get.y - -20;
+            }
+            Point p = new Point(nx, ny);
+            pat = U.makeRectangle(
+                (dzgOffsetX + (lGCW / 2)) + (p.x - displayCounter / 2),
+                (y + ((lGCH * i) + (lGCH / 2))) + (p.y - displayCounter / 2),
+                (dzgOffsetX + (lGCW / 2)) + (p.x - displayCounter / 2) + displayCounter,
+                (y + ((lGCH * i) + (lGCH / 2))) + (p.y - displayCounter / 2) + displayCounter
             );
-            g2.setPaint( Color.red);
-            // g2.setPaint(new Color(0, 0, 255));
+             */
+            int nx = 0, ny = 0;
+            if (p.x > 0) {
+                nx = p.x + tempGap;
+            } else if (p.x < 0) {
+                nx = p.x - tempGap;
+            }
+            if (p.y > 0) {
+                ny = p.y + tempGap;
+            } else if (p.y < 0) {
+                ny = p.y - tempGap;
+            }
+            Point pp = new Point(nx, ny);
+            Shape pat = U.makeRectangle(
+                    (dzgOffsetX + (lGCW / 2)) + (pp.x - tempStartSize1 / 2),
+                    (yy + ((lGCH * tempPatternSelect) + (lGCH / 2))) + (pp.y - tempStartSize1 / 2),
+                    (dzgOffsetX + (lGCW / 2)) + (pp.x - tempStartSize1 / 2) + tempStartSize1,
+                    (yy + ((lGCH * tempPatternSelect) + (lGCH / 2))) + (pp.y - tempStartSize1 / 2) + tempStartSize1
+            );
+            // g2.setPaint(Color.red);
+            System.out.println(an2R + " " + an2G + " " + an2B);
+            g2.setPaint(new Color((int) an2R, (int) an2G, (int) an2B));
             g2.fill(pat);
             g2.setPaint(Color.black);
             g2.setStroke(new BasicStroke(1));
             g2.draw(pat);
         }
 
-        setAnimationReturn = false;
+        if (tempStartSize1 == startSize2 - 5) {
+            tempStartSize1 = startSize1;
+            animationReturnCount = 0;
+            setAnimationReturn = false;
+            tempGap = 0;
+            an2R = 100.0;
+            an2G = 100.0;
+            an2B = 230.0;
+        }
+
+        if (an2R >= 10.0 && an2B <= 252.5) {
+            an2R -= 10.0;
+            an2G -= 10.0;
+            an2B += 2.5;
+        }
+
+        tempGap -= 2;
+        tempStartSize1--;
+
+        if (animationReturnCount == 10) {
+            //animationReturnCount = 0;
+            //setAnimationReturn = false;
+        }
+        animationReturnCount++;
+
     }//end animationReturn
 
     private void animPlace(Graphics2D g2) {
         boolean bull1 = false, bull2 = false, bull3 = false, bull4 = false, bull5 = false;
         //System.out.println(c.getX()+" "+c.getY()+" "+newx+" "+newy);
-        int startSize2 = 30;
 
         for (Point p : tempPattern) {
             Shape pat = U.makeRectangle(
@@ -842,40 +936,21 @@ public class BlockGame extends JPanel implements ActionListener {
             dragZones[i] = new Point(dzgOffsetX, y + (lGCH * i));
             g2.setPaint(Color.white);
             g2.fill(shape);
-            /*
-            if (i == 0 && testing1) {
-                g2.setPaint(Color.green);
-            } else if (i == 1 && testing2) {
-                g2.setPaint(Color.green);
-            } else if (i == 2 && testing3) {
-                g2.setPaint(Color.green);
-            } else {
-                g2.setPaint(Color.black);
-            }
-             */
             g2.setPaint(Color.black);
             g2.setStroke(new BasicStroke(3));
             g2.draw(shape);
-
         }
         ////
 
         //box border
         g2.setStroke(new BasicStroke(4));
-        /*
-        if (testing) {
-            g2.setPaint(Color.green);
-        } else {
-            g2.setPaint(Color.black);
-        }
-         */
+
         g2.setPaint(Color.black);
         Shape shape = U.makeRectangle(cubeObject.getX(), cubeObject.getY(), cubeObject.getX() + cubeObject.getW(), cubeObject.getY() + cubeObject.getH());
         g2.draw(shape);
         //pattern
         for (int i = 0; i < peaces.size(); i++) {
-            int startSize1 = 40;
-            int startSize2 = 30;
+
             if (patternsDispay[i]) {
                 if (dispalyRestart) {
                     Shape pat;
