@@ -746,7 +746,7 @@ public class BlockGame extends JPanel implements ActionListener {
             }
             Point pp = new Point(nx, ny);
 
-            System.out.println(snapMouse.x + " " + (difX * 10));
+            //System.out.println(snapMouse.x + " " + (difX * 10));
             //System.out.println((snapMouse.x-(int)animationReturnX));
             Shape pat = U.makeRectangle(
                     /*((dzgOffsetX + (snapMouse.x-(int)animationReturnX)) + (lGCW / 2)) + (pp.x - tempStartSize1 / 2),
