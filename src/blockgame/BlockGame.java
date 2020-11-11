@@ -655,6 +655,13 @@ public class BlockGame extends JPanel implements ActionListener {
 
         if (nullList.size() > 0) {
             counter1 = cubes.get(0).getW();
+            //Sound s1 = new Sound("133284__leszek-szary__level-completed.wav");
+            // s1.start();
+            Sound s2 = new Sound("351543__richerlandtv__programme-complete.wav");
+             s2.start();
+           // Sound s3 = new Sound("352661__foolboymedia__complete-chime.wav");
+           //  s3.start();
+               
             nullList.forEach((ai) -> {
                 for (int i : ai) {
                     cubes.get(i).setNs(5);
