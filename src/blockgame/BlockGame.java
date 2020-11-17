@@ -9,6 +9,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Toolkit;
@@ -18,11 +19,19 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import javax.imageio.ImageIO;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -43,6 +52,7 @@ public class BlockGame extends JPanel implements ActionListener {
     private final PaintSurface paintSurface;
     private Utility U = new Utility();
     private PuzzleMenu PM;
+    private Score SC;
     private final CubeObject cubeObject;
     private ArrayList<Cube> cubes;
 
@@ -89,6 +99,9 @@ public class BlockGame extends JPanel implements ActionListener {
     private double an2R = 100.0, an2G = 100.0, an2B = 230.0;
 
     private double animationReturnX = 0, animationReturnY = 0;
+    
+    private int multaplayer = 0;
+    private int scoreCount = 0;
 
     private Point[] tempPattern;
 
@@ -111,6 +124,7 @@ public class BlockGame extends JPanel implements ActionListener {
 
     private int animationReturnTimer = 0;
 
+    
     private boolean end = false;
     private final int menux1 = 400;
     private final int menuy1 = 200;
@@ -162,6 +176,7 @@ public class BlockGame extends JPanel implements ActionListener {
         cubeObject = new CubeObject(startX, startY, w, h, row, col, Color.black);
         createPeaces();
         PM = new PuzzleMenu(200, 150, cubeObject.getW(), cubeObject.getH());
+        SC = new Score(200, 100, 40, "Helvetica", Color.BLACK);
         timer.start();
     }//end Spiral constructer
 
@@ -288,6 +303,8 @@ public class BlockGame extends JPanel implements ActionListener {
          */
         randomPeaces();
     }//end createPeaces
+    
+
 
     private void randomPeaces() {
         peaces = new ArrayList<>();
@@ -313,6 +330,8 @@ public class BlockGame extends JPanel implements ActionListener {
             repaint();
         }
     }
+
+
 
     public class PaintSurface extends JComponent {
 
@@ -358,11 +377,17 @@ public class BlockGame extends JPanel implements ActionListener {
                                 for (Cube c : cubes) {
                                     c.setNs(1);
                                 }
+                                
                                 randomPeaces();
+                                SC.setTempScore(0);
+                                SC.setScore(0);
+                                Sound re = new Sound("Pickup_Coin4.wav");
+                                re.start();
                                 for (int i = 0; i < noFit.length; i++) {
                                     noFit[i] = true;
                                     patternsDispay[i] = true;
                                 }
+                                
 
                             }
                             if (menu2hov) {
@@ -538,6 +563,7 @@ public class BlockGame extends JPanel implements ActionListener {
             }
 
             if (!broken) {
+                /*
                 int[] temInt1 = new int[cubes.size()];
                 for (int i = 0; i < cubes.size(); i++) {
                     for (int j = 0; j < intpat.length; j++) {
@@ -548,8 +574,9 @@ public class BlockGame extends JPanel implements ActionListener {
                         }
                     }
                 }
+                */
 
-                lightBlueArray = new ArrayList<>();
+                //lightBlueArray = new ArrayList<>();
                 lightBlueArray = U.checkCompleet(U.convertIntegers(tempBlueArray));
                 //System.out.println(Arrays.toString(intpat));
                 // System.out.println(Arrays.toString(temInt1));
@@ -653,21 +680,41 @@ public class BlockGame extends JPanel implements ActionListener {
         }
         ArrayList<int[]> nullList = U.checkCompleet(temInt2);
 
-        if (nullList.size() > 0) {
+        multaplayer = nullList.size();
+        
+        scoreCount = 0;
+        if(nullList.isEmpty()){
+           scoreCount = peaces.get(tempPatternSelect).length;
+           SC.setTempScore(SC.getScore()+scoreCount);    
+        }else if(nullList.size()==1){
+            scoreCount = nullList.get(0).length;
+            SC.setTempScore(SC.getScore()+scoreCount);
             counter1 = cubes.get(0).getW();
-            //Sound s1 = new Sound("133284__leszek-szary__level-completed.wav");
-            // s1.start();
             Sound s2 = new Sound("351543__richerlandtv__programme-complete.wav");
-             s2.start();
-           // Sound s3 = new Sound("352661__foolboymedia__complete-chime.wav");
-           //  s3.start();
-               
+            s2.start();
             nullList.forEach((ai) -> {
-                for (int i : ai) {
-                    cubes.get(i).setNs(5);
+            for (int i : ai) {
+                cubes.get(i).setNs(5);
+                }
+            });
+        }else  if(nullList.size()>1){
+            int count = 0;
+            for(int i=0;i<nullList.size();i++){
+                count += nullList.get(i).length;
+            }
+            scoreCount = count*nullList.size();
+            SC.setTempScore(SC.getScore()+scoreCount);
+            
+            counter1 = cubes.get(0).getW();
+            Sound s2 = new Sound("Randomize3.wav");
+            s2.start();
+            nullList.forEach((ai) -> {
+            for (int i : ai) {
+                cubes.get(i).setNs(5);
                 }
             });
         }
+
         noFit = U.checkShape(peaces, cubes);
         boolean[] tembull = {true, true, true};
         if (patternsDispay[0] == false && patternsDispay[1] == false && patternsDispay[2] == false) {
@@ -705,6 +752,9 @@ public class BlockGame extends JPanel implements ActionListener {
         g2.fillRect(0, 0, getWidth(), getHeight());
         grid(g2);
         puzzleMenu(g2);
+        
+        score(g2);
+        
         if (setAnimation) {
             animPlace(g2);
         }
@@ -717,6 +767,69 @@ public class BlockGame extends JPanel implements ActionListener {
         }
 
     }//end paint
+
+    private void score(Graphics2D g2) {       
+        FontRenderContext frc = g2.getFontRenderContext();  
+        TextLayout textTl = new TextLayout("Score: "+String.valueOf(SC.getScore()), SC.getF(), frc);
+        
+        TextLayout textT2 = new TextLayout(
+                "$$ Multaplayer "+String.valueOf(multaplayer)+" $$",
+                SC.getF(),
+                frc);
+        
+        
+        AffineTransform oldXForm = g2.getTransform();
+        
+        AffineTransform transform1 = new AffineTransform();
+        AffineTransform transform2 = new AffineTransform();
+        
+        Shape outline1 = textTl.getOutline(null);
+        Shape outline2 = textT2.getOutline(null);
+             
+        //Rectangle outlineBounds = outline.getBounds();
+        transform1 = g2.getTransform();
+        transform1.translate(SC.getX(), SC.getY());
+        g2.transform(transform1);
+        g2.setStroke(new BasicStroke(2));
+        if(SC.getScore()<SC.getTempScore()){
+            SC.setScore(SC.getScore()+1);
+            g2.setColor(Color.BLUE);
+        }else{
+            g2.setColor(SC.getC());
+        }
+        
+        g2.draw(outline1);
+        //g2.setClip(outline1);
+        //g2.dispose();
+        
+        g2.setTransform(oldXForm);
+        
+        
+        int alp = 0;
+        if(multaplayer > 0){
+            if(SC.getScore()<SC.getTempScore()){
+                g2.setColor(Color.BLUE);
+                alp = 10;
+            }else{
+                multaplayer = 0;
+                alp = 0;
+            }  
+        }
+        float alpha = alp * 0.1f;
+        AlphaComposite alcom = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+        g2.setComposite(alcom);
+        transform2 = g2.getTransform();
+        transform2.translate(SC.getX()+170, SC.getY()+250);
+        g2.transform(transform2);
+        g2.draw(outline2);
+        //g2.setClip(outline2);
+        
+        //reset
+        g2.setTransform(oldXForm);
+        float alpha2 = 10 * 0.1f;
+        AlphaComposite alcom2 = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha2);
+        g2.setComposite(alcom2);
+    }// end score
 
     private void animationReturn(Graphics2D g2) {
         int tempsiaze;
@@ -825,20 +938,9 @@ public class BlockGame extends JPanel implements ActionListener {
         }
  
 
-        for (int i = 0; i < tempPattern.length; i++) {
-            Shape pat = U.makeRectangle(
-                    newx + (tempPattern[i].x - (startSize1 / 2)),
-                    newy + (tempPattern[i].y - (startSize1 / 2)),
-                    newx + (tempPattern[i].x + (startSize1 - (startSize1 / 2))),
-                    newy + (tempPattern[i].y + (startSize1 - (startSize1 / 2)))
-            );
-            
-   
-                    g2.setPaint(new Color(anR, anG, anB));
-        
-
-         
-
+         for (Point tempPattern1 : tempPattern) {
+            Shape pat = U.makeRectangle(newx + (tempPattern1.x - (startSize1 / 2)), newy + (tempPattern1.y - (startSize1 / 2)), newx + (tempPattern1.x + (startSize1 - (startSize1 / 2))), newy + (tempPattern1.y + (startSize1 - (startSize1 / 2))));
+            g2.setPaint(new Color(anR, anG, anB));
             // g2.setPaint(new Color(0, 0, 255));
             g2.fill(pat);
             g2.setPaint(Color.black);
@@ -1188,4 +1290,5 @@ public class BlockGame extends JPanel implements ActionListener {
     }//end paintBackground
 
 }//end Spiral
+
 
