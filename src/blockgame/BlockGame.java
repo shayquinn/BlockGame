@@ -806,7 +806,7 @@ public class BlockGame extends JPanel implements ActionListener {
         
         
         int alp = 0;
-        if(multaplayer > 0){
+        if(multaplayer > 1){
             if(SC.getScore()<SC.getTempScore()){
                 g2.setColor(Color.BLUE);
                 alp = 10;
