@@ -62,7 +62,10 @@ public class Utility {
             }
         }
         return iapa;
+        
     }//end checkCompleet
+    
+ 
 
     boolean cons(int sx, int sy, int sw, int sh, int x, int y) {
         return x >= sx && y >= sy && x <= sx + sw && y <= sy + sh;

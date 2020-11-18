@@ -9,7 +9,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Rectangle;
+
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Toolkit;
@@ -684,10 +684,10 @@ public class BlockGame extends JPanel implements ActionListener {
         
         scoreCount = 0;
         if(nullList.isEmpty()){
-           scoreCount = peaces.get(tempPatternSelect).length;
+           scoreCount = peaces.get(tempPatternSelect).length*SC.getSooreUnit();
            SC.setTempScore(SC.getScore()+scoreCount);    
         }else if(nullList.size()==1){
-            scoreCount = nullList.get(0).length;
+            scoreCount = nullList.get(0).length*SC.getSooreUnit();
             SC.setTempScore(SC.getScore()+scoreCount);
             counter1 = cubes.get(0).getW();
             Sound s2 = new Sound("351543__richerlandtv__programme-complete.wav");
@@ -702,7 +702,7 @@ public class BlockGame extends JPanel implements ActionListener {
             for(int i=0;i<nullList.size();i++){
                 count += nullList.get(i).length;
             }
-            scoreCount = count*nullList.size();
+            scoreCount = (count*SC.getSooreUnit())*nullList.size();
             SC.setTempScore(SC.getScore()+scoreCount);
             
             counter1 = cubes.get(0).getW();
@@ -777,7 +777,6 @@ public class BlockGame extends JPanel implements ActionListener {
                 SC.getF(),
                 frc);
         
-        
         AffineTransform oldXForm = g2.getTransform();
         
         AffineTransform transform1 = new AffineTransform();
@@ -792,18 +791,15 @@ public class BlockGame extends JPanel implements ActionListener {
         g2.transform(transform1);
         g2.setStroke(new BasicStroke(2));
         if(SC.getScore()<SC.getTempScore()){
-            SC.setScore(SC.getScore()+1);
+            SC.setScore(SC.getScore()+SC.getSooreUnit());
             g2.setColor(Color.BLUE);
         }else{
             g2.setColor(SC.getC());
         }
-        
         g2.draw(outline1);
         //g2.setClip(outline1);
-        //g2.dispose();
         
         g2.setTransform(oldXForm);
-        
         
         int alp = 0;
         if(multaplayer > 1){
@@ -834,10 +830,7 @@ public class BlockGame extends JPanel implements ActionListener {
     private void animationReturn(Graphics2D g2) {
         int tempsiaze;
         double difX = (snapMouse.x - PM.getDragZonesC()[tempPatternSelect].x) / 10, difY = (snapMouse.y - PM.getDragZonesC()[tempPatternSelect].y) / 10;
-        /*
-        Shape shape = U.makeRectangle(PM.getX(), yy + (PM.getCellW() * tempPatternSelect), dzgOffsetY + PM.getCellH(), yy + ((PM.getCellW() * tempPatternSelect) + PM.getCellH()));
-         */
-        // PM.getDragZones()[tempPatternSelect] = new Point(PM.getX(), yy + (PM.getCellH() * tempPatternSelect));
+
         g2.setPaint(Color.white);
         g2.fill(PM.getZoneShapes()[tempPatternSelect]);
         g2.setPaint(Color.black);
@@ -859,8 +852,6 @@ public class BlockGame extends JPanel implements ActionListener {
             }
             Point pp = new Point(nx, ny);
 
-            //System.out.println(snapMouse.x + " " + (difX * 10));
-            //System.out.println((snapMouse.x-(int)animationReturnX));
             Shape pat = U.makeRectangle(
                     /*((dzgOffsetX + (snapMouse.x-(int)animationReturnX)) + (lGCW / 2)) + (pp.x - tempStartSize1 / 2),
                     ((yy + (snapMouse.y - (int)animationReturnY)) + ((lGCH * tempPatternSelect) + (lGCH / 2))) + (pp.y - tempStartSize1 / 2),
@@ -890,19 +881,6 @@ public class BlockGame extends JPanel implements ActionListener {
             animationReturnX = 0;
             animationReturnY = 0;
         }
-        /*
-        if (tempStartSize1 == startSize2 - 5) {
-            tempStartSize1 = startSize1;
-            animationReturnCount = 0;
-            setAnimationReturn = false;
-            tempGap = 0;
-            an2R = 100.0;
-            an2G = 100.0;
-            an2B = 230.0;
-            animationReturnX = 0;
-            animationReturnY = 0;
-        }
-         */
 
         if (an2R >= 10.0 && an2B <= 252.5) {
             an2R -= 10.0;
@@ -920,8 +898,6 @@ public class BlockGame extends JPanel implements ActionListener {
 
     private void animPlace(Graphics2D g2) {
         boolean bull1 = false, bull2 = false, bull3 = false, bull4 = false, bull5 = false;
-        //System.out.println(c.getX()+" "+c.getY()+" "+newx+" "+newy);
-
         for (Point p : tempPattern) {
             Shape pat = U.makeRectangle(
                     cubes.get(snapCubeUM).getX() + p.x,
@@ -930,15 +906,13 @@ public class BlockGame extends JPanel implements ActionListener {
                     cubes.get(snapCubeUM).getY() + (p.y + 50)
             );
             g2.setPaint(Color.white);
-            // g2.setPaint(new Color(0, 0, 255));
             g2.fill(pat);
             g2.setPaint(Color.black);
             g2.setStroke(new BasicStroke(1));
             g2.draw(pat);
         }
- 
-
-         for (Point tempPattern1 : tempPattern) {
+         
+        for (Point tempPattern1 : tempPattern) {
             Shape pat = U.makeRectangle(newx + (tempPattern1.x - (startSize1 / 2)), newy + (tempPattern1.y - (startSize1 / 2)), newx + (tempPattern1.x + (startSize1 - (startSize1 / 2))), newy + (tempPattern1.y + (startSize1 - (startSize1 / 2))));
             g2.setPaint(new Color(anR, anG, anB));
             // g2.setPaint(new Color(0, 0, 255));
@@ -947,9 +921,7 @@ public class BlockGame extends JPanel implements ActionListener {
             g2.setStroke(new BasicStroke(1));
             g2.draw(pat);
         }
-
-        //System.out.println(cubes.get(snapCubeUM).getX() + " " + cubes.get(snapCubeUM).getY() + " " + newx + " " + newy);
-        // System.out.println(c.getX()>newx);
+         
         if (startSize1 < 50) {
             startSize1++;
         } else if (startSize1 == 50) {
@@ -1025,12 +997,6 @@ public class BlockGame extends JPanel implements ActionListener {
 
         g2.setFont(font);
         g2.drawString(" Exit ", menux2 + menuw / 2, menuy2 + menuh / 2);
-
-        /*
-                    Font font = new Font("Serif", Font.PLAIN, 12);
-                    g2.setFont(font);
-                    g2.drawString("" + clock + "", c.getX() + c.getW() / 2, c.getY() + c.getH() / 2);
-         */
     }//end menu
 
     private void puzzleMenu(Graphics2D g2) {
@@ -1038,12 +1004,6 @@ public class BlockGame extends JPanel implements ActionListener {
         ///// drag zones
         g2.setStroke(new BasicStroke(3));
         for (int i = 0; i < 3; i++) {
-            /*
-            Shape shape = U.makeRectangle(dzgOffsetX, dzgOffsetY + (lGCW * i), dzgOffsetX + lGCH, dzgOffsetY + ((lGCW * i) + lGCH));
-            dragZones[i] = new Point(dzgOffsetX, dzgOffsetY + (lGCH * i));
-            
-             */
-
             g2.setPaint(Color.white);
             g2.fill(PM.getZoneShapes()[i]);
             g2.setPaint(Color.black);
@@ -1184,12 +1144,6 @@ public class BlockGame extends JPanel implements ActionListener {
                     g2.setPaint(Color.gray);
                     g2.setStroke(new BasicStroke(1));
                     g2.draw(c.getS());
-
-                    /*
-                    Font font = new Font("Serif", Font.PLAIN, 12);
-                    g2.setFont(font);
-                    g2.drawString("" + clock + "", c.getX() + c.getW() / 2, c.getY() + c.getH() / 2);
-                     */
                     break;
                 case 2:
                     lightBlueArray = null;
@@ -1290,5 +1244,4 @@ public class BlockGame extends JPanel implements ActionListener {
     }//end paintBackground
 
 }//end Spiral
-
 

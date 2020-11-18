@@ -5,10 +5,10 @@ import java.awt.Color;
 import java.awt.Font;
 
 
-public class Score {
+class Score {
     private int score = 0;
     private int tempScore = 0;
-    private int sooreUnit = 100;
+    private final int sooreUnit = 5;
     private int x, y, Fsize;
     private String FS;
     private Font F;
